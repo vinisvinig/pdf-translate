@@ -109,25 +109,29 @@ document.addEventListener('DOMContentLoaded', () => {
       // Substitua 'caminho/para/sua/fonte/arial.ttf' pelo caminho real do seu arquivo.
       // Se você não tiver um arquivo de fonte, pode tentar usar uma URL de CDN para fontes comuns como Roboto.
       // Exemplo com fonte local:
-      const fontBytes = await fetch('caminho/para/sua/fonte/arial.ttf') // Altere este caminho!
-                              .then(res => {
-                                  if (!res.ok) throw new Error(`Não foi possível carregar a fonte: ${res.statusText}`);
-                                  return res.arrayBuffer();
-                              })
-                              .catch(err => {
-                                  console.error("Erro ao carregar a fonte personalizada, usando Helvetica como fallback.", err);
-                                  return null; // Retorna null para usar a fonte padrão como fallback
-                              });
+      const fontPath = 'fonts/Roboto-Regular.ttf'; // <--- Mude este caminho para o seu arquivo .ttf!
+      let font;
 
-      const font = fontBytes ? await doc.embedFont(fontBytes) : await doc.embedFont(StandardFonts.Helvetica);
-
-      // Tratamento de caracteres problemáticos se a fonte fallback for usada
-      const cleanedTranslated = fontBytes ? translated : translated.replace(/[\u2032\u2033]/g, "'"); // Remove 'prime' e 'double prime' se estiver usando fonte padrão
+      try {
+          const fontBytes = await fetch(fontPath)
+                                  .then(res => {
+                                      if (!res.ok) throw new Error(`Não foi possível carregar a fonte: ${res.statusText}`);
+                                      return res.arrayBuffer();
+                                  });
+          font = await doc.embedFont(fontBytes);
+          console.log('Fonte personalizada carregada com sucesso.');
+      } catch (err) {
+          console.error(`Erro ao carregar a fonte personalizada em '${fontPath}'. Usando StandardFonts.Helvetica como fallback.`, err);
+          font = await doc.embedFont(StandardFonts.Helvetica);
+          // Se fallback para Helvetica, limpe caracteres problemáticos
+          translated = translated.replace(/[\u2032\u2033]/g, "'"); // Substitui 'prime' e 'double prime' por apóstrofos simples
+      }
 
       const size = 12, margin = 50;
       let page = doc.addPage(), y = page.getHeight() - margin;
 
-      for (let line of splitIntoLines(cleanedTranslated, 80)) {
+      // Passa o texto (potencialmente limpo se fallback de fonte) para a função de quebra de linhas
+      for (let line of splitIntoLines(translated, 80)) {
         if (y < margin) {
           page = doc.addPage();
           y    = page.getHeight() - margin;
@@ -159,13 +163,27 @@ document.addEventListener('DOMContentLoaded', () => {
     const lines = [];
     let line    = '';
     for (const w of words) {
-      // Adicionado um espaço extra para evitar palavras coladas em quebras de linha
-      if ((line + w + ' ').length > maxChars && line.length > 0) {
+      // Se a palavra sozinha já for maior que maxChars, trate-a (quebre-a)
+      if (w.length > maxChars) {
+        if (line.trim().length > 0) { // Adiciona a linha atual antes de quebrar a palavra longa
+          lines.push(line.trim());
+          line = '';
+        }
+        // Quebra a palavra longa em pedaços
+        for (let i = 0; i < w.length; i += maxChars) {
+          lines.push(w.substring(i, Math.min(i + maxChars, w.length)));
+        }
+        continue; // Pula para a próxima palavra
+      }
+
+      // Se adicionar a palavra atual exceder o limite, inicia uma nova linha
+      if ((line + w).length > maxChars && line.length > 0) { // line.length > 0 evita uma linha vazia no início
         lines.push(line.trim());
         line = '';
       }
       line += w + ' ';
     }
+    // Adiciona a última linha se não estiver vazia
     if (line.trim()) lines.push(line.trim());
     return lines;
   }
