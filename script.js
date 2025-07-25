@@ -1,50 +1,73 @@
-document.addEventListener("DOMContentLoaded", function () {
-  const inputText = document.getElementById("inputText");
-  const modeSelect = document.getElementById("modeSelect");
-  const transformBtn = document.getElementById("transformBtn");
-  const outputText = document.getElementById("outputText");
-
-  transformBtn.addEventListener("click", function () {
-    const text = inputText.value;
-    const mode = modeSelect.value;
-    let result = "";
-
-    switch (mode) {
-      case "uppercase":
-        result = text.toUpperCase();
-        break;
-      case "lowercase":
-        result = text.toLowerCase();
-        break;
-      case "capitalize":
-        result = text
-          .toLowerCase()
-          .split(" ")
-          .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-          .join(" ");
-        break;
-      case "snake":
-        result = text
-          .toLowerCase()
-          .replace(/\s+/g, "_")
-          .replace(/[^\w_]/g, "");
-        break;
-      case "kebab":
-        result = text
-          .toLowerCase()
-          .replace(/\s+/g, "-")
-          .replace(/[^\w-]/g, "");
-        break;
-      case "reverse":
-        result = text.split("").reverse().join("");
-        break;
-      case "remove-spaces":
-        result = text.replace(/\s+/g, "");
-        break;
-      default:
-        result = text;
-    }
-
-    outputText.textContent = result;
-  });
-});
+.pdf-translator {
+  max-width: 700px;
+  margin: 40px auto;
+  font-family: sans-serif;
+}
+.pdf-translator h2 {
+  margin-bottom: 16px;
+}
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.file-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #f1f1f1;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.file-label input {
+  display: none;
+}
+.file-label span {
+  font-size: 14px;
+  color: #333;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px;
+}
+progress {
+  width: 150px;
+  height: 12px;
+  display: none;
+  border: none;
+  border-radius: 6px;
+  background: #e0e0e0;
+}
+button {
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  padding: 8px 14px;
+  font-size: 14px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color .2s;
+}
+button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+button:not(:disabled):hover {
+  background-color: #0056b3;
+}
+.status {
+  margin-top: 16px;
+  font-weight: bold;
+  color: #333;
+}
+.output {
+  margin-top: 16px;
+  white-space: pre-wrap;
+  background: #f9f9f9;
+  padding: 12px;
+  border-radius: 6px;
+  max-height: 300px;
+  overflow-y: auto;
+  display: none;
+}
