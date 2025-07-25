@@ -1,26 +1,29 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
-  <meta charset="UTF-8">
-  <title>Tradutor de PDF</title>
-  <link rel="stylesheet" href="style.css">
-  <!-- PDF.js e PDF-Lib -->
-  <script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
-  <script src="https://unpkg.com/pdfjs-dist@2.16.105/build/pdf.min.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tradutor com Detecção de Idioma</title>
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <div class="pdf-translator">
-    <h2>Tradutor de PDF</h2>
-    <div class="controls">
-      <label class="file-label">
-        <input type="file" id="pdfInput" accept="application/pdf">
-        <span id="fileName">Nenhum arquivo selecionado</span>
-      </label>
-      <progress id="loadProgress" max="100" value="0"></progress>
-      <button id="translateBtn" disabled>Traduzir PDF</button>
-    </div>
-    <div id="status" class="status"></div>
-    <pre id="output" class="output"></pre>
+  <div class="container">
+    <h1>Tradutor com Detecção de Idioma</h1>
+
+    <textarea id="inputText" placeholder="Digite o texto para traduzir"></textarea>
+
+    <select id="languageSelector">
+      <option value="pt">Português</option>
+      <option value="en">Inglês</option>
+      <option value="es">Espanhol</option>
+      <option value="fr">Francês</option>
+      <option value="de">Alemão</option>
+    </select>
+
+    <button onclick="translateText()">Traduzir</button>
+
+    <h2>Tradução:</h2>
+    <div id="outputText"></div>
   </div>
 
   <script src="script.js"></script>
